@@ -1,0 +1,30 @@
+@model ProjectManager.Backend.Models.Wizard.ProjectWizardStep2Model
+@{
+    ViewData["Title"] = "Создание проекта — Шаг 2";
+    Layout = "_Layout";
+}
+
+<h2>Шаг 2 — Компании</h2>
+
+<form asp-action="Step2" method="post" class="mt-4 col-6">
+
+    <div class="mb-3">
+        <label asp-for="CustomerCompany" class="form-label"></label>
+        <input asp-for="CustomerCompany" class="form-control" />
+        <span asp-validation-for="CustomerCompany" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ContractorCompany" class="form-label"></label>
+        <input asp-for="ContractorCompany" class="form-control" />
+        <span asp-validation-for="ContractorCompany" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Далее</button>
+    <a asp-action="Step1" class="btn btn-secondary ms-2">Назад</a>
+
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

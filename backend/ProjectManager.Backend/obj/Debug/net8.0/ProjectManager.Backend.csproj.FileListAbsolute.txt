@@ -130,3 +130,8 @@ D:\Projects\ProjectManager\backend\ProjectManager.Backend\obj\Debug\net8.0\refin
 D:\Projects\ProjectManager\backend\ProjectManager.Backend\obj\Debug\net8.0\ProjectManager.Backend.pdb
 D:\Projects\ProjectManager\backend\ProjectManager.Backend\obj\Debug\net8.0\ProjectManager.Backend.genruntimeconfig.cache
 D:\Projects\ProjectManager\backend\ProjectManager.Backend\obj\Debug\net8.0\ref\ProjectManager.Backend.dll
+D:\Projects\ProjectManager\backend\ProjectManager.Backend\obj\Debug\net8.0\ProjectManager.Backend.sourcelink.json
+D:\Projects\ProjectManager\backend\ProjectManager.Backend\bin\Debug\net8.0\ProjectManager.Backend.staticwebassets.runtime.json
+D:\Projects\ProjectManager\backend\ProjectManager.Backend\obj\Debug\net8.0\ProjectManager.Backend.RazorAssemblyInfo.cache
+D:\Projects\ProjectManager\backend\ProjectManager.Backend\obj\Debug\net8.0\ProjectManager.Backend.RazorAssemblyInfo.cs
+D:\Projects\ProjectManager\backend\ProjectManager.Backend\bin\Debug\net8.0\libman.json

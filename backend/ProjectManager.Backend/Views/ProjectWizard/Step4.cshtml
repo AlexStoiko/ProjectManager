@@ -1,0 +1,90 @@
+@model ProjectManager.Backend.Models.Wizard.ProjectWizardStep4Model
+
+<h2>Шаг 4 — выбор исполнителей</h2>
+
+<div class="form-group">
+    <label>Поиск сотрудников</label>
+    <input id="employee-search" type="text" class="form-control" placeholder="Введите имя, фамилию или email">
+</div>
+
+<ul id="search-results" class="list-group mt-2"></ul>
+
+<h4 class="mt-4">Выбранные сотрудники:</h4>
+<ul id="selected-list" class="list-group">
+</ul>
+
+<form method="post" id="step4-form">
+    @foreach (var id in Model.SelectedEmployeeIds)
+    {
+        <input type="hidden" name="SelectedEmployeeIds" value="@id" />
+    }
+
+    <button class="btn btn-primary mt-3" type="submit">Далее</button>
+    <a class="btn btn-secondary mt-3" href="/ProjectWizard/Step3">Назад</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const searchInput = document.getElementById("employee-search");
+        const results = document.getElementById("search-results");
+        const selectedList = document.getElementById("selected-list");
+
+        function addSelectedEmployee(id, name) {
+            if (document.querySelector(`input[value="${id}"]`)) return;
+
+            const li = document.createElement("li");
+            li.className = "list-group-item d-flex justify-content-between align-items-center";
+            li.innerHTML = `
+                <span>${name}</span>
+                <button type="button" class="btn btn-danger btn-sm remove-btn" data-id="${id}">Удалить</button>
+            `;
+            selectedList.appendChild(li);
+
+            const hidden = document.createElement("input");
+            hidden.type = "hidden";
+            hidden.name = "SelectedEmployeeIds";
+            hidden.value = id;
+            document.getElementById("step4-form").appendChild(hidden);
+        }
+
+        selectedList.addEventListener("click", (e) => {
+            if (!e.target.classList.contains("remove-btn")) return;
+
+            const id = e.target.dataset.id;
+
+            const input = document.querySelector(`input[name="SelectedEmployeeIds"][value="${id}"]`);
+            if (input) input.remove();
+
+            e.target.closest("li").remove();
+        });
+
+        searchInput.addEventListener("input", async () => {
+            const query = searchInput.value.trim();
+            results.innerHTML = "";
+
+            if (query.length < 2) return;
+
+            const response = await fetch(`/api/employees/search?query=${query}`);
+            const employees = await response.json();
+
+            employees.forEach(e => {
+                const name = `${e.lastName} ${e.firstName} ${e.middleName}`;
+
+                const li = document.createElement("li");
+                li.className = "list-group-item list-group-item-action";
+                li.textContent = `${name} (${e.email})`;
+                li.dataset.id = e.id;
+
+                li.onclick = () => {
+                    addSelectedEmployee(e.id, `${name} (${e.email})`);
+                    results.innerHTML = "";
+                    searchInput.value = "";
+                };
+
+                results.appendChild(li);
+            });
+        });
+    </script>
+}

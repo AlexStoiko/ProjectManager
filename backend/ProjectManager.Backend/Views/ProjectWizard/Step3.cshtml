@@ -1,0 +1,81 @@
+@model ProjectManager.Backend.Models.Wizard.ProjectWizardStep3Model
+
+@{
+    ViewData["Title"] = "Выбор руководителя проекта";
+}
+
+<h2>Шаг 3 — Выбор руководителя проекта</h2>
+
+<form method="post">
+
+    <div class="form-group">
+        <label asp-for="ManagerId"></label>
+
+        <input id="employee-search" type="text" class="form-control"
+               placeholder="Введите имя или email сотрудника..."
+               autocomplete="off" />
+
+        <div id="search-results" class="list-group" style="position:absolute; z-index:1000; width:50%;"></div>
+
+        <input type="hidden" asp-for="ManagerId" id="ManagerId" />
+
+        <div class="mt-2">
+            <strong>Выбрано:</strong>
+            <span id="selected-name">@Model.ManagerName</span>
+        </div>
+
+        <span asp-validation-for="ManagerId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Далее</button>
+    <a asp-action="Step2" class="btn btn-secondary">Назад</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const searchInput = document.getElementById("employee-search");
+        const resultsBox = document.getElementById("search-results");
+        const hiddenId = document.getElementById("ManagerId");
+        const selectedName = document.getElementById("selected-name");
+
+        let searchTimeout = null;
+
+        searchInput.addEventListener("input", function () {
+            const query = this.value.trim();
+
+            if (searchTimeout) clearTimeout(searchTimeout);
+
+            if (query.length < 2) {
+                resultsBox.innerHTML = "";
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                fetch(`/api/employees/search?query=${encodeURIComponent(query)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        resultsBox.innerHTML = "";
+
+                        data.forEach(emp => {
+                            const item = document.createElement("a");
+                            item.classList.add("list-group-item", "list-group-item-action");
+                            item.innerText =
+                                `${emp.lastName} ${emp.firstName} ${emp.middleName ?? ""} (${emp.email})`;
+                            item.style.cursor = "pointer";
+
+                            item.addEventListener("click", () => {
+                                hiddenId.value = emp.id;
+                                selectedName.textContent = item.innerText;
+                                searchInput.value = "";
+                                resultsBox.innerHTML = "";
+                            });
+
+                            resultsBox.appendChild(item);
+                        });
+                    });
+            }, 300);
+        });
+    </script>
+}

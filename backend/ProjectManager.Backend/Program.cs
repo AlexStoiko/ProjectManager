@@ -23,7 +23,11 @@ builder.Services.AddScoped<IProjectFileService, ProjectFileService>();
 builder.Services.AddAutoMapper(typeof(Program));
 
 // Controllers
-builder.Services.AddControllers();
+//builder.Services.AddControllers();
+
+// Add MVC + Views + TempData
+builder.Services.AddControllersWithViews().AddSessionStateTempDataProvider();
+builder.Services.AddSession();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -31,17 +35,29 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// Static files (css/js/images)
+app.UseStaticFiles();
+
+app.UseSession();
+
+// Routing
+app.UseRouting();
+
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.MapControllers();
+// Map MVC controllers (Views)
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+//app.MapControllers();
 
 app.Run();

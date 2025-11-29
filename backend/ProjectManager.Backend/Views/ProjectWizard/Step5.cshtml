@@ -1,0 +1,83 @@
+@model ProjectManager.Backend.Models.Wizard.ProjectWizardStep5Model
+
+@{
+    ViewData["Title"] = "Шаг 5 — Загрузка документов";
+}
+
+<h2>Шаг 5 — Загрузка документов проекта</h2>
+
+<form method="post" enctype="multipart/form-data">
+
+    <div id="drop-zone"
+         style="border:2px dashed #888; padding:40px; text-align:center; cursor:pointer;">
+        <p style="font-size:18px;">Перетащите файлы сюда или кликните для выбора</p>
+        <input type="file" id="file-input" name="Files" multiple style="display:none;" />
+    </div>
+
+    <h4 class="mt-3">Выбранные файлы:</h4>
+    <ul id="file-list"></ul>
+
+    <span asp-validation-summary="All" class="text-danger"></span>
+
+    <button type="submit" class="btn btn-primary mt-3">Завершить</button>
+    <a asp-action="Step4" class="btn btn-secondary mt-3">Назад</a>
+
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const dropZone = document.getElementById("drop-zone");
+        const fileInput = document.getElementById("file-input");
+        const fileList = document.getElementById("file-list");
+        let filesArray = [];
+
+        function updateList() {
+            fileList.innerHTML = "";
+            filesArray.forEach(f => {
+                let li = document.createElement("li");
+                li.textContent = f.name;
+                fileList.appendChild(li);
+            });
+        }
+
+        dropZone.addEventListener("click", () => fileInput.click());
+
+        fileInput.addEventListener("change", function () {
+            for (let file of this.files) {
+                filesArray.push(file);
+            }
+
+            let dt = new DataTransfer();
+            filesArray.forEach(f => dt.items.add(f));
+            fileInput.files = dt.files;
+
+            updateList();
+        });
+
+        dropZone.addEventListener("dragover", function (e) {
+            e.preventDefault();
+            dropZone.style.background = "#eef";
+        });
+
+        dropZone.addEventListener("dragleave", function () {
+            dropZone.style.background = "white";
+        });
+
+        dropZone.addEventListener("drop", function (e) {
+            e.preventDefault();
+            dropZone.style.background = "white";
+
+            for (let file of e.dataTransfer.files) {
+                filesArray.push(file);
+            }
+
+            let dt = new DataTransfer();
+            filesArray.forEach(f => dt.items.add(f));
+            fileInput.files = dt.files;
+
+            updateList();
+        });
+    </script>
+}
