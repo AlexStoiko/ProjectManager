@@ -80,20 +80,32 @@ namespace ProjectManager.Backend.Controllers
 
         // GET: api/employees/search?query=ivan
         [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<Employee>>> Search(string query)
+        public async Task<IActionResult> Search(string query)
         {
             if (string.IsNullOrWhiteSpace(query))
-                return new List<Employee>();
+                return Ok(new List<Employee>());
 
-            query = query.ToLower();
+            var q = query.ToLower();
 
-            return await _context.Employees
+            var employees = await _context.Employees.ToListAsync();
+
+            var result = employees
                 .Where(e =>
-                    e.FirstName.ToLower().Contains(query) ||
-                    e.LastName.ToLower().Contains(query) ||
-                    e.MiddleName.ToLower().Contains(query) ||
-                    e.Email.ToLower().Contains(query))
-                .ToListAsync();
+                    (e.FirstName ?? "").ToLower().Contains(q) ||
+                    (e.LastName ?? "").ToLower().Contains(q) ||
+                    (e.MiddleName ?? "").ToLower().Contains(q) ||
+                    (e.Email ?? "").ToLower().Contains(q)
+                )
+                .Select(e => new {
+                    id = e.Id,
+                    firstName = e.FirstName,
+                    lastName = e.LastName,
+                    middleName = e.MiddleName,
+                    email = e.Email
+                })
+                .ToList();
+
+            return Ok(result);
         }
     }
 }

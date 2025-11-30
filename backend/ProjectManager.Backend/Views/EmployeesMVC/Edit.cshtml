@@ -1,0 +1,54 @@
+@model ProjectManager.Backend.Models.EmployeeFormViewModel
+@{
+    ViewData["Title"] = "Редактировать сотрудника";
+}
+
+<h2>Редактировать сотрудника</h2>
+
+<form method="post" asp-action="Edit" asp-route-id="@Model.Id">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label>Фамилия</label>
+        <input class="form-control" name="LastName" value="@Model.LastName" required />
+    </div>
+    <div class="mb-3">
+        <label>Имя</label>
+        <input class="form-control" name="FirstName" value="@Model.FirstName" required />
+    </div>
+    <div class="mb-3">
+        <label>Отчество</label>
+        <input class="form-control" name="MiddleName" value="@Model.MiddleName" />
+    </div>
+    <div class="mb-3">
+        <label>Email</label>
+        <input class="form-control" name="Email" type="email" value="@Model.Email" />
+    </div>
+
+    <div class="mb-3">
+        <label>Должность (выберите существующую)</label>
+        <select class="form-select" name="PositionId">
+            <option value="">-- без должности --</option>
+            @foreach (var p in Model.Positions)
+            {
+                if (p.Selected)
+                {
+                    <option value="@p.Value" selected>@p.Text</option>
+                }
+                else
+                {
+                    <option value="@p.Value">@p.Text</option>
+                }
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Или введите новую должность</label>
+        <input class="form-control" name="NewPositionName" value="@Model.NewPositionName" placeholder="Например: Старший разработчик" />
+        <small class="text-muted">Если заполнено — будет создана новая должность и назначена сотруднику.</small>
+    </div>
+
+    <button class="btn btn-primary">Сохранить</button>
+    <a class="btn btn-secondary" href="/EmployeesMvc">Отмена</a>
+</form>

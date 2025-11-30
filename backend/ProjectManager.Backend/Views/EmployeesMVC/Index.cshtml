@@ -1,0 +1,40 @@
+@model IEnumerable<ProjectManager.Backend.Data.DTOs.Employee.EmployeeDto>
+
+<h2>Сотрудники</h2>
+
+<a class="btn btn-primary mb-3" href="/EmployeesMVC/Create">Добавить сотрудника</a>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>ФИО</th>
+            <th>Email</th>
+            <th>Должность</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var e in Model)
+    {
+        <tr>
+            <td>@e.Id</td>
+            <td>@($"{e.LastName} {e.FirstName} {e.MiddleName}")</td>
+            <td>@e.Email</td>
+            <td>@e.PositionName</td>
+            <td>
+                <a class="btn btn-sm btn-info" href="/EmployeesMVC/Details/@e.Id">Открыть</a>
+                <a class="btn btn-sm btn-warning ms-1" href="/EmployeesMVC/Edit/@e.Id">Редактировать</a>
+
+                <form method="post" asp-action="Delete" asp-route-id="@e.Id" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-sm btn-danger ms-1"
+                        onclick="return confirm('Удалить сотрудника @e.LastName?');">
+                        Удалить
+                    </button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

@@ -1,0 +1,89 @@
+@model ProjectManager.Backend.Models.ProjectUpdateViewModel
+
+@{
+    ViewData["Title"] = "Редактировать проект";
+    Layout = "_Layout";
+    var employees = ViewBag.Employees as IEnumerable<ProjectManager.Backend.Data.DTOs.Employee.EmployeeDto>;
+}
+
+<h2>Редактировать проект</h2>
+
+<form asp-action="Edit" method="post" class="col-8">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CustomerCompany" class="form-label"></label>
+        <input asp-for="CustomerCompany" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ContractorCompany" class="form-label"></label>
+        <input asp-for="ContractorCompany" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Priority" class="form-label"></label>
+        <select asp-for="Priority" class="form-select">
+            @for (int i = 1; i <= 10; i++)
+            {
+                <option value="@i" selected="@(Model.Priority == i ? "selected" : null)">@i</option>
+            }
+        </select>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="StartDate" class="form-label"></label>
+            <input asp-for="StartDate" type="date" class="form-control" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="EndDate" class="form-label"></label>
+            <input asp-for="EndDate" type="date" class="form-control" />
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ManagerId" class="form-label"></label>
+        <select asp-for="ManagerId" class="form-select">
+            <option value="">-- не выбран --</option>
+            @if (employees != null)
+            {
+                foreach (var e in employees)
+                {
+                    var full = $"{e.LastName} {e.FirstName} {e.MiddleName}";
+                    <option value="@e.Id" selected="@(Model.ManagerId == e.Id ? "selected" : null)">@full (@e.Email)</option>
+                }
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Исполнители</label>
+        <select id="employees-select" name="EmployeeIds" multiple class="form-select">
+            @if (employees != null)
+            {
+                foreach (var e in employees)
+                {
+                    var full = $"{e.LastName} {e.FirstName} {e.MiddleName}";
+                    var selected = Model.EmployeeIds.Contains(e.Id) ? "selected" : null;
+                    <option value="@e.Id" selected="@selected">@full (@e.Email)</option>
+                }
+            }
+        </select>
+        <small class="form-text text-muted">Удерживайте Ctrl для выбора нескольких сотрудников</small>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary ms-2">Отмена</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

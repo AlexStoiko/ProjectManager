@@ -1,5 +1,8 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace ProjectManager.Backend.Data.Entities
 {
+    [Table("ProjectFile")] 
     public class ProjectFile
     {
         public int Id { get; set; }

@@ -1,0 +1,29 @@
+@model ProjectManager.Backend.DTOs.Projects.ProjectDto
+
+@{
+    ViewData["Title"] = "Проект создан";
+    Layout = "_Layout";
+}
+
+<h2>Проект успешно создан</h2>
+
+@if (Model == null)
+{
+    <p>Информация о проекте недоступна.</p>
+}
+else
+{
+    <div class="card">
+        <div class="card-body">
+            <h4>@Model.Title</h4>
+            <p><strong>Заказчик:</strong> @Model.CustomerCompany</p>
+            <p><strong>Исполнитель:</strong> @Model.ContractorCompany</p>
+            <p><strong>Приоритет:</strong> @Model.Priority</p>
+            <p><strong>Даты:</strong> @Model.StartDate.ToString("yyyy-MM-dd") — @Model.EndDate.ToString("yyyy-MM-dd")</p>
+            <p><strong>Руководитель:</strong> @Model.Manager?.FullName</p>
+
+            <a class="btn btn-primary" href="@Url.Action("Index", "Home")">На главную</a>
+            <a class="btn btn-secondary" href="@Url.Action("Index", "Projects")">Список проектов</a>
+        </div>
+    </div>
+}

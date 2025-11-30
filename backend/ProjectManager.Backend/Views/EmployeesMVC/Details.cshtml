@@ -1,0 +1,10 @@
+@model ProjectManager.Backend.Data.DTOs.Employee.EmployeeDto
+
+<h2>Информация о сотруднике</h2>
+
+<p><strong>ФИО:</strong> @($"{Model.LastName} {Model.FirstName} {Model.MiddleName}")</p>
+<p><strong>Email:</strong> @Model.Email</p>
+<p><strong>Должность:</strong> @Model.PositionName</p>
+
+<a class="btn btn-secondary" href="/EmployeesMvc">Назад</a>
+<a class="btn btn-warning ms-1" href="/EmployeesMvc/Edit/@Model.Id">Редактировать</a>

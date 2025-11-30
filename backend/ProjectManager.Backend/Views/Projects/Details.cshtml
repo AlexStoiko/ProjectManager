@@ -1,0 +1,20 @@
+@model ProjectManager.Backend.DTOs.Projects.ProjectDto
+
+<h2>Проект: @Model.Title</h2>
+
+<p><strong>Компания-заказчик:</strong> @Model.CustomerCompany</p>
+<p><strong>Компания-исполнитель:</strong> @Model.ContractorCompany</p>
+<p><strong>Период:</strong> @Model.StartDate.ToShortDateString() — @Model.EndDate.ToShortDateString()</p>
+
+<h3>Руководитель проекта</h3>
+<p>@Model.Manager?.FullName</p>
+
+<h3>Исполнители</h3>
+<ul>
+@foreach (ProjectManager.Backend.DTOs.Projects.ProjectEmployeeShortDto e in Model.Employees)
+{
+    <li>@e.FullName</li>
+}
+</ul>
+
+<a class="btn btn-secondary" href="/Projects">Назад</a>

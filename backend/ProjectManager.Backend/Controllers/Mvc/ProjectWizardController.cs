@@ -1,10 +1,23 @@
 using Microsoft.AspNetCore.Mvc;
+using ProjectManager.Backend.DTOs.Projects;
 using ProjectManager.Backend.Models.Wizard;
+using ProjectManager.Backend.Services;
 
 namespace ProjectManager.Backend.Controllers.Mvc
 {
     public class ProjectWizardController : Controller
     {
+        private readonly IProjectService _projectService;
+        private readonly IProjectFileService _projectFileService;
+
+        public ProjectWizardController(
+            IProjectService projectService,
+            IProjectFileService projectFileService)
+        {
+            _projectService = projectService;
+            _projectFileService = projectFileService;
+        }
+
         // STEP 1 GET
         public IActionResult Step1()
         {
@@ -102,7 +115,6 @@ namespace ProjectManager.Backend.Controllers.Mvc
             return View(model);
         }
 
-
         // STEP 3 POST
         [HttpPost]
         public IActionResult Step3(ProjectWizardStep3Model model)
@@ -124,7 +136,7 @@ namespace ProjectManager.Backend.Controllers.Mvc
             if (TempData.ContainsKey("SelectedEmployees"))
             {
                 var ids = TempData["SelectedEmployees"] as string;
-                model.SelectedEmployeeIds = ids.Split(',')
+                model.SelectedEmployeeIds = ids.Split(',', StringSplitOptions.RemoveEmptyEntries)
                     .Select(int.Parse)
                     .ToList();
 
@@ -162,23 +174,76 @@ namespace ProjectManager.Backend.Controllers.Mvc
             if (!ModelState.IsValid)
                 return View(model);
 
-            string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            // Collect ProjectCreateDto from TempData
+            var dto = new ProjectCreateDto();
 
-            if (!Directory.Exists(uploadPath))
-                Directory.CreateDirectory(uploadPath);
+            if (TempData.ContainsKey("ProjectName"))
+                dto.Title = TempData["ProjectName"] as string ?? "";
 
-            foreach (var file in model.Files)
+            if (TempData.ContainsKey("CustomerCompany"))
+                dto.CustomerCompany = TempData["CustomerCompany"] as string ?? "";
+
+            if (TempData.ContainsKey("ContractorCompany"))
+                dto.ContractorCompany = TempData["ContractorCompany"] as string ?? "";
+
+            if (TempData.ContainsKey("Priority") && int.TryParse(TempData["Priority"]?.ToString(), out var pr))
+                dto.Priority = pr;
+
+            if (TempData.ContainsKey("StartDate") && DateTime.TryParse(TempData["StartDate"]?.ToString(), out var sd))
+                dto.StartDate = sd;
+
+            if (TempData.ContainsKey("EndDate") && DateTime.TryParse(TempData["EndDate"]?.ToString(), out var ed))
+                dto.EndDate = ed;
+
+            if (TempData.ContainsKey("ManagerId") && int.TryParse(TempData["ManagerId"]?.ToString(), out var mid))
+                dto.ManagerId = mid;
+
+            if (TempData.ContainsKey("SelectedEmployees"))
             {
-                var filePath = Path.Combine(uploadPath, file.FileName);
+                var s = TempData["SelectedEmployees"] as string;
+                dto.EmployeeIds = s?.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList() ?? new List<int>();
+                TempData["SelectedEmployees"] = s;
+            }
 
-                using (var stream = new FileStream(filePath, FileMode.Create))
+            // Create project
+            var created = await _projectService.CreateAsync(dto);
+
+            if (created == null)
+            {
+                ModelState.AddModelError("", "Не удалось создать проект.");
+                return View(model);
+            }
+
+            if (dto.EmployeeIds != null && dto.EmployeeIds.Count > 0)
+            {
+                await _projectService.AddEmployeesAsync(created.Id, dto.EmployeeIds);
+            }
+
+            // Upload files using ProjectFileService
+            if (model.Files != null && model.Files.Any())
+            {
+                foreach (var file in model.Files)
                 {
-                    await file.CopyToAsync(stream);
+                    var uploadDto = new ProjectManager.Backend.DTOs.ProjectFiles.ProjectFileUploadDto
+                    {
+                        File = file
+                    };
+
+                    await _projectFileService.UploadAsync(created.Id, uploadDto);
                 }
             }
 
-            return RedirectToAction("Finish");
+            return RedirectToAction("Finish", new { id = created.Id });
         }
 
+        // FINISH / Result
+        public async Task<IActionResult> Finish(int id)
+        {
+            var project = await _projectService.GetByIdAsync(id);
+            if (project == null)
+                return View("Finish", model: null);
+
+            return View(project);
+        }
     }
 }

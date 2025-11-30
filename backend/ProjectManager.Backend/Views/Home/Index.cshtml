@@ -3,8 +3,43 @@
     Layout = "_Layout";
 }
 
-<h1>ProjectManager — Home</h1>
+<div class="container mt-5">
 
-<p>Welcome! Backend API available at <a href="/swagger">/swagger</a></p>
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">ProjectManager</h1>
+        <p class="text-muted fs-5">Добро пожаловать в систему управления проектами</p>
+    </div>
 
-<p>Для начала разработки MVC-визарда создадим отдельный контроллер ProjectWizard и views.</p>
+    <div class="d-flex justify-content-center gap-3 mb-5">
+
+        <a class="btn btn-success btn-lg px-4" href="/ProjectWizard/Step1">
+            ✚ Создать новый проект
+        </a>
+
+        <a class="btn btn-primary btn-lg px-4" href="/Projects">
+            📁 Информация о проектах
+        </a>
+
+        <a class="btn btn-info btn-lg px-4 text-white" href="/EmployeesMvc">
+            👥 Информация о сотрудниках
+        </a>
+
+    </div>
+
+    <div class="text-center mt-4">
+        <p class="text-muted">
+            Backend API доступен по адресу:
+            <a href="/swagger">/swagger</a>
+        </p>
+    </div>
+
+</div>
+
+<style>
+    .btn-lg {
+        border-radius: 10px;
+    }
+    .container h1 {
+        color: #2c3e50;
+    }
+</style>
